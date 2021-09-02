@@ -1,13 +1,35 @@
 package tests
 
 import ru.yourok.torrserve.search.RuTracker
+import ru.yourok.torrserve.search.TorrentInfo
 import ru.yourok.torrserve.search.TorrentInfoFull
+import java.text.SimpleDateFormat
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class RuTrackerTest {
     @Test
-    fun testParse() {
+    fun testParseSearch() {
+        val input = this::class.java.classLoader?.getResourceAsStream("rutracker.search.html")
+        val actual = RuTracker().parseSearchPage(input!!)
+
+        // check correct parser
+        assertEquals(
+            TorrentInfo(
+                "Остров фантазий / Fantasy Island / Сезон: 1 / Серии: 1-4 из 10 (Адам Кэйн) [2021, США, Фэнтези, драма, детектив, приключения, WEBRip] MVO (HDRezka Studio)",
+                "2.06 GB",
+                "viewtopic.php?t=6094532",
+                SimpleDateFormat("dd-MM-yyyy").parse("02-09-2021")
+            ),
+            actual.first[0]
+        )
+
+        // check empty exceptions
+        assertEquals(0, actual.second.size)
+    }
+
+    @Test
+    fun testParsePage() {
         val input = this::class.java.classLoader?.getResourceAsStream("rutracker.torrent.html")
         val actual = RuTracker().parseTorrentPage(input!!)
 

@@ -1,13 +1,35 @@
 package tests
 
 import ru.yourok.torrserve.search.Rutor
+import ru.yourok.torrserve.search.TorrentInfo
 import ru.yourok.torrserve.search.TorrentInfoFull
+import java.text.SimpleDateFormat
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class RutorTest {
     @Test
-    fun testParse() {
+    fun testParseSearch() {
+        val input = this::class.java.classLoader?.getResourceAsStream("rutor.search.html")
+        val actual = Rutor().parseSearchPage(input!!)
+
+        // check correct parser
+        assertEquals(
+            TorrentInfo(
+                "Острые козырьки / Заточенные кепки / от HEVC-CLUB",
+                "97.04 GB",
+                "/torrent/821111/ostrye-kozyrki_zatochennye-kepki_peaky-blinders-s01-05-2013-2019-bdrip-hevc-1080p-ot-hevc-club-d-p-p2",
+                SimpleDateFormat("dd-MM-yyyy").parse("14-06-2021")
+            ),
+            actual.first[0]
+        )
+
+        // check empty exceptions
+        assertEquals(0, actual.second.size)
+    }
+
+    @Test
+    fun testParsePage() {
         val input = this::class.java.classLoader?.getResourceAsStream("rutor.torrent.html")
         val actual = Rutor().parseTorrentPage(input!!)
 
