@@ -20,6 +20,7 @@ import ru.yourok.torrserve.app.App
 import ru.yourok.torrserve.ext.clearStackFragmnet
 import ru.yourok.torrserve.server.api.Api
 import ru.yourok.torrserve.server.local.TorrService
+import ru.yourok.torrserve.ui.fragments.SearchFragment
 import ru.yourok.torrserve.ui.fragments.add.AddFragment
 import ru.yourok.torrserve.ui.fragments.donate.DonateFragment
 import ru.yourok.torrserve.ui.fragments.donate.DonateMessage
@@ -149,6 +150,11 @@ class MainActivity : AppCompatActivity() {
             ServerSettingsFragment().show(this, R.id.container, true)
             closeMenu()
             true
+        }
+
+        findViewById<FrameLayout>(R.id.btnSearch).setOnClickListener {
+            SearchFragment().show(this, R.id.container, true)
+            closeMenu()
         }
 
         findViewById<FrameLayout>(R.id.btnAdd).setOnClickListener {
