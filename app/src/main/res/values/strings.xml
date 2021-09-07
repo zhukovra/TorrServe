@@ -234,5 +234,6 @@
     <string name="not_used">Not Used</string>
     <string name="not_installed">Not Installed</string>
     <string name="search">Search</string>
+    <string name="sort">Sort</string>
 
 </resources>

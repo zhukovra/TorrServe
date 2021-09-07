@@ -1,12 +1,16 @@
-package ru.yourok.torrserve.ui.fragments
+package ru.yourok.torrserve.ui.fragments.search
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.RadioGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,13 +19,19 @@ import org.jsoup.Jsoup
 import ru.yourok.torrserve.R
 import ru.yourok.torrserve.app.App
 import ru.yourok.torrserve.search.Rutor
-import ru.yourok.torrserve.ui.fragments.search.SearchAdapter
+import ru.yourok.torrserve.ui.fragments.TSFragment
 import java.net.SocketTimeoutException
 
 class SearchFragment : TSFragment() {
 
     private lateinit var recyclerView: RecyclerView
     private val adapter = SearchAdapter()
+    private val settings by lazy { view?.findViewById<LinearLayout>(R.id.searchSettings) }
+    private val preferences by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
+
+    companion object {
+        const val chosenSortPrefName = "chosenSort"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,13 +48,39 @@ class SearchFragment : TSFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initSearchSettings()
+
         view.apply {
+            // save sort setting
+            findViewById<RadioGroup>(R.id.searchSettingsSort).setOnCheckedChangeListener { _, id ->
+                preferences?.edit()?.putInt(chosenSortPrefName, id)?.apply()
+            }
+            // search torrents
             findViewById<EditText>(R.id.search_input).setOnEditorActionListener { textView, i, _ ->
                 if (i == EditorInfo.IME_ACTION_SEARCH) {
                     search(textView.text.toString())
+                    settings?.visibility = View.GONE
                     true
                 } else false
             }
+            // show search settings on key up (TV)
+            findViewById<EditText>(R.id.search_input).setOnKeyListener { view, i, keyEvent ->
+                val cursorPos = (view as EditText).selectionStart
+
+                if (cursorPos == 0 && keyEvent.action == KeyEvent.ACTION_DOWN && keyEvent.keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+                    settings?.visibility = View.VISIBLE
+                    false
+                } else false
+            }
+
+        }
+    }
+
+    // Setup saved preferences
+    private fun initSearchSettings() {
+        val chosenSort = preferences?.getInt(chosenSortPrefName, -1) ?: -1
+        if (chosenSort != -1) {
+            view?.findViewById<RadioGroup>(R.id.searchSettingsSort)?.check(chosenSort)
         }
     }
 

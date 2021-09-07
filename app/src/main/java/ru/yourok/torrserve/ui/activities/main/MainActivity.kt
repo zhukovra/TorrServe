@@ -20,7 +20,7 @@ import ru.yourok.torrserve.app.App
 import ru.yourok.torrserve.ext.clearStackFragmnet
 import ru.yourok.torrserve.server.api.Api
 import ru.yourok.torrserve.server.local.TorrService
-import ru.yourok.torrserve.ui.fragments.SearchFragment
+import ru.yourok.torrserve.ui.fragments.search.SearchFragment
 import ru.yourok.torrserve.ui.fragments.add.AddFragment
 import ru.yourok.torrserve.ui.fragments.donate.DonateFragment
 import ru.yourok.torrserve.ui.fragments.donate.DonateMessage
