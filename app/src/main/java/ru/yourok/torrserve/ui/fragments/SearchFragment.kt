@@ -1,22 +1,27 @@
 package ru.yourok.torrserve.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.*
+import org.jsoup.Jsoup
 import ru.yourok.torrserve.R
 import ru.yourok.torrserve.app.App
+import ru.yourok.torrserve.search.Rutor
 import ru.yourok.torrserve.ui.fragments.search.SearchAdapter
+import java.net.SocketTimeoutException
 
 class SearchFragment : TSFragment() {
 
     private lateinit var recyclerView: RecyclerView
     private val adapter = SearchAdapter()
-    private var searchResults = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,20 +41,34 @@ class SearchFragment : TSFragment() {
         view.apply {
             findViewById<EditText>(R.id.search_input).setOnEditorActionListener { textView, i, _ ->
                 if (i == EditorInfo.IME_ACTION_SEARCH) {
-                    App.Toast(textView.text.toString())
-                    // TODO run in background
-                    search()
-                    adapter.addSearchResults(searchResults)
+                    search(textView.text.toString())
                 }
-                true
+                false
             }
         }
     }
 
-    // TODO search
-    private fun search() {
-        val data = mutableListOf<String>()
-        (0..50).forEach { i -> data.add("$i element") }
-        searchResults = data
+    // TODO search with multiple trackers
+    private fun search(term: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val document = Jsoup.connect("http://rutor.info/search/$term").timeout(5000).get()
+
+                withContext(Dispatchers.Main) {
+                    val results = Rutor().parseSearchPage(document)
+                    recyclerView.smoothScrollToPosition(0)
+                    adapter.setSearchResults(results.first)
+                    if (results.second.isNotEmpty()) {
+                        for (ex in results.second) {
+                            Log.w("Rutor", "Parse error: " + ex.message)
+                        }
+                    }
+                    // TODO show|send exceptions in results.second
+                }
+
+            } catch (e: SocketTimeoutException) {
+                App.Toast("Error connection to Rutor")
+            }
+        }
     }
 }

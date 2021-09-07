@@ -1,5 +1,6 @@
 package tests
 
+import org.jsoup.Jsoup
 import ru.yourok.torrserve.search.Rutor
 import ru.yourok.torrserve.search.TorrentInfo
 import ru.yourok.torrserve.search.TorrentInfoFull
@@ -11,15 +12,18 @@ internal class RutorTest {
     @Test
     fun testParseSearch() {
         val input = this::class.java.classLoader?.getResourceAsStream("rutor.search.html")
-        val actual = Rutor().parseSearchPage(input!!)
+        val actual = Rutor().parseSearchPage(Jsoup.parse(input!!.bufferedReader().use { it.readText() }))
 
         // check correct parser
         assertEquals(
             TorrentInfo(
-                "Острые козырьки / Заточенные кепки / от HEVC-CLUB",
-                "97.04 GB",
-                "/torrent/821111/ostrye-kozyrki_zatochennye-kepki_peaky-blinders-s01-05-2013-2019-bdrip-hevc-1080p-ot-hevc-club-d-p-p2",
-                SimpleDateFormat("dd-MM-yyyy").parse("14-06-2021")
+                "Острые козырьки / Заточенные кепки / Peaky Blinders [S01-05] (2013-2019) BDRip | LostFilm",
+                "25.51 GB",
+                "/torrent/603483/ostrye-kozyrki_zatochennye-kepki_peaky-blinders-s01-05-2013-2019-bdrip-lostfilm",
+                16,
+                18,
+                "magnet:?xt=urn:btih:f98232717d438356d879d26743fe981a15f45fef&dn=rutor.info&tr=udp://opentor.org:2710&tr=udp://opentor.net:6969&tr=http://retracker.local/announce",
+                SimpleDateFormat("dd-MM-yyyy").parse("05-09-2021")
             ),
             actual.first[0]
         )

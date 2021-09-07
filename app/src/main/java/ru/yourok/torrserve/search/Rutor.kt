@@ -1,6 +1,7 @@
 package ru.yourok.torrserve.search
 
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import java.io.InputStream
 import java.lang.Exception
 import java.text.SimpleDateFormat
@@ -8,13 +9,13 @@ import java.util.*
 
 // Rewrite Rutor date "20 Сен 12" into "20 сент. 12"
 private fun String.prepareMonth(): String {
-    return this.lowercase().split(" ").map {
+    return this.lowercase().split(" ").joinToString(" ") {
         when (it) {
             "янв" -> "янв."
-            "фев" -> "фев."
+            "фев" -> "февр."
             "мар" -> "мар."
             "апр" -> "апр."
-            "мая" -> "мая"
+            "май" -> "мая"
             "июн" -> "июн."
             "июл" -> "июл."
             "авг" -> "авг."
@@ -24,16 +25,14 @@ private fun String.prepareMonth(): String {
             "дек" -> "дек."
             else -> it
         }
-    }.joinToString(" ")
+    }
 }
 
 /**
  * Parse RuTor.org
  */
 class Rutor : TrackerParser {
-    override fun parseSearchPage(input: InputStream): Pair<MutableList<TorrentInfo>, MutableList<Exception>> {
-        val doc = parseInput(input)
-
+    override fun parseSearchPage(doc: Document): Pair<MutableList<TorrentInfo>, MutableList<Exception>> {
         val results = mutableListOf<TorrentInfo>()
         val exceptions = mutableListOf<Exception>()
         val dateParser = SimpleDateFormat("dd MMM yy", Locale("ru"))
@@ -48,8 +47,11 @@ class Rutor : TrackerParser {
                     results.add(
                         TorrentInfo(
                             link.text(),
-                            ti[3].text(),
+                            it.getElementsByTag("td").last { i -> i.attr("align") == "right" }.text(),
                             link.attr("href"),
+                            it.getElementsByTag("td").last().getElementsByTag("span").first().text().toInt(),
+                            it.getElementsByTag("td").last().getElementsByTag("span").last().text().toInt(),
+                            it.getElementsByTag("a").first { t -> t.attr("href").startsWith("magnet:") }?.attr("href"),
                             dateParser.parse(ti[0].text().prepareMonth().lowercase()),
                         )
                     )

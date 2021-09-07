@@ -3,8 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/gradient_divider_green.xml" value="0.359375" />
+        <entry key="app/src/main/res/drawable/ic_outline_content_copy.xml" value="0.359375" />
+        <entry key="app/src/main/res/drawable/rc_background_black.xml" value="0.359375" />
+        <entry key="app/src/main/res/drawable/rc_background_dark.xml" value="0.359375" />
+        <entry key="app/src/main/res/drawable/rc_background_light.xml" value="0.359375" />
+        <entry key="app/src/main/res/layout/fragment_search.xml" value="0.35625" />
         <entry key="app/src/main/res/layout/info_fragment.xml" value="0.23981481481481481" />
         <entry key="app/src/main/res/layout/play_activity.xml" value="0.23981481481481481" />
+        <entry key="app/src/main/res/layout/search_item.xml" value="0.5" />
       </map>
     </option>
   </component>

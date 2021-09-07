@@ -1,6 +1,7 @@
 package ru.yourok.torrserve.search
 
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import java.io.InputStream
 import java.lang.Exception
 import java.nio.charset.Charset
@@ -9,7 +10,7 @@ import java.util.*
 
 // Rewrite Rutracker date "20-Сен-12" into "20 сент. 12"
 private fun String.prepareMonth(): String {
-    return this.lowercase().split("-").map {
+    return this.lowercase().split("-").joinToString(" ") {
         when (it) {
             "янв" -> "янв."
             "фев" -> "фев."
@@ -25,16 +26,14 @@ private fun String.prepareMonth(): String {
             "дек" -> "дек."
             else -> it
         }
-    }.joinToString(" ")
+    }
 }
 
 /**
  * Parse Rutracker.org
  */
 class RuTracker : TrackerParser {
-    override fun parseSearchPage(input: InputStream): Pair<MutableList<TorrentInfo>, MutableList<Exception>> {
-        val doc = parseInput(input)
-
+    override fun parseSearchPage(doc: Document): Pair<MutableList<TorrentInfo>, MutableList<Exception>> {
         val results = mutableListOf<TorrentInfo>()
         val exceptions = mutableListOf<Exception>()
         val dateParser = SimpleDateFormat("dd MMM yy", Locale("ru"))
@@ -43,11 +42,16 @@ class RuTracker : TrackerParser {
             try {
                 val link = it.getElementsByTag("a").filter { l -> l.hasAttr("data-topic_id") }.first()
                 val date = dateParser.parse(it.getElementsByTag("td").last().getElementsByTag("p").first().text().prepareMonth())
+                val seeds = it.getElementsByClass("seedmed")?.first()?.text() ?: ""
+                val leechers = it.getElementsByClass("leechmed")?.first()?.text() ?: ""
                 results.add(
                     TorrentInfo(
                         link.text(),
                         it.getElementsByTag("a").filter { l -> l.hasClass("dl-stub") }.first().text().dropLast(2),
                         link.attr("href"),
+                        if (seeds.matches(Regex("^\\d+$"))) seeds.toInt() else 0,
+                        if (leechers.matches(Regex("^\\d+$"))) leechers.toInt() else 0,
+                        null,
                         date,
                     )
                 )

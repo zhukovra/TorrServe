@@ -1,8 +1,10 @@
 package tests
 
+import org.jsoup.Jsoup
 import ru.yourok.torrserve.search.RuTracker
 import ru.yourok.torrserve.search.TorrentInfo
 import ru.yourok.torrserve.search.TorrentInfoFull
+import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -11,7 +13,7 @@ internal class RuTrackerTest {
     @Test
     fun testParseSearch() {
         val input = this::class.java.classLoader?.getResourceAsStream("rutracker.search.html")
-        val actual = RuTracker().parseSearchPage(input!!)
+        val actual = RuTracker().parseSearchPage(Jsoup.parse(input!!.bufferedReader(Charset.forName("Windows-1251")).use { it.readText() }))
 
         // check correct parser
         assertEquals(
@@ -19,6 +21,9 @@ internal class RuTrackerTest {
                 "Остров фантазий / Fantasy Island / Сезон: 1 / Серии: 1-4 из 10 (Адам Кэйн) [2021, США, Фэнтези, драма, детектив, приключения, WEBRip] MVO (HDRezka Studio)",
                 "2.06 GB",
                 "viewtopic.php?t=6094532",
+                8,
+                9,
+                null,
                 SimpleDateFormat("dd-MM-yyyy").parse("02-09-2021")
             ),
             actual.first[0]
