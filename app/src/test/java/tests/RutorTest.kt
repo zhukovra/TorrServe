@@ -1,7 +1,7 @@
 package tests
 
 import org.jsoup.Jsoup
-import ru.yourok.torrserve.search.Rutor
+import ru.yourok.torrserve.search.parsers.Rutor
 import ru.yourok.torrserve.search.TorrentInfo
 import ru.yourok.torrserve.search.TorrentInfoFull
 import java.text.SimpleDateFormat

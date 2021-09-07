@@ -18,16 +18,17 @@ import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import ru.yourok.torrserve.R
 import ru.yourok.torrserve.app.App
-import ru.yourok.torrserve.search.Rutor
+import ru.yourok.torrserve.search.parsers.Rutor
 import ru.yourok.torrserve.ui.fragments.TSFragment
 import java.net.SocketTimeoutException
 
 class SearchFragment : TSFragment() {
 
-    private lateinit var recyclerView: RecyclerView
     private val adapter = SearchAdapter()
-    private val settings by lazy { view?.findViewById<LinearLayout>(R.id.searchSettings) }
-    private val preferences by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
+
+    private val recyclerView by lazy { requireView().findViewById<RecyclerView>(R.id.search_recycler_view) }
+    private val settings by lazy { requireView().findViewById<LinearLayout>(R.id.searchSettings) }
+    private val preferences by lazy { requireActivity().getPreferences(Context.MODE_PRIVATE) }
 
     companion object {
         const val chosenSortPrefName = "chosenSort"
@@ -38,8 +39,6 @@ class SearchFragment : TSFragment() {
         savedInstanceState: Bundle?
     ): View {
         val vi = inflater.inflate(R.layout.fragment_search, container, false)
-        // init recycler widget
-        recyclerView = vi.findViewById(R.id.search_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
         return vi
@@ -53,13 +52,13 @@ class SearchFragment : TSFragment() {
         view.apply {
             // save sort setting
             findViewById<RadioGroup>(R.id.searchSettingsSort).setOnCheckedChangeListener { _, id ->
-                preferences?.edit()?.putInt(chosenSortPrefName, id)?.apply()
+                preferences.edit()?.putInt(chosenSortPrefName, id)?.apply()
             }
             // search torrents
             findViewById<EditText>(R.id.search_input).setOnEditorActionListener { textView, i, _ ->
                 if (i == EditorInfo.IME_ACTION_SEARCH) {
                     search(textView.text.toString())
-                    settings?.visibility = View.GONE
+                    settings.visibility = View.GONE
                     true
                 } else false
             }
@@ -78,7 +77,7 @@ class SearchFragment : TSFragment() {
 
     // Setup saved preferences
     private fun initSearchSettings() {
-        val chosenSort = preferences?.getInt(chosenSortPrefName, -1) ?: -1
+        val chosenSort = preferences.getInt(chosenSortPrefName, -1) ?: -1
         if (chosenSort != -1) {
             view?.findViewById<RadioGroup>(R.id.searchSettingsSort)?.check(chosenSort)
         }

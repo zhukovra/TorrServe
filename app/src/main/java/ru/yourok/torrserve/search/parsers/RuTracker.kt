@@ -1,33 +1,15 @@
-package ru.yourok.torrserve.search
+package ru.yourok.torrserve.search.parsers
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import ru.yourok.torrserve.search.TorrentInfo
+import ru.yourok.torrserve.search.TorrentInfoFull
+import ru.yourok.torrserve.search.TrackerParser
 import java.io.InputStream
 import java.lang.Exception
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.*
-
-// Rewrite Rutracker date "20-Сен-12" into "20 сент. 12"
-private fun String.prepareMonth(): String {
-    return this.lowercase().split("-").joinToString(" ") {
-        when (it) {
-            "янв" -> "янв."
-            "фев" -> "фев."
-            "мар" -> "мар."
-            "апр" -> "апр."
-            "мая" -> "мая"
-            "июн" -> "июн."
-            "июл" -> "июл."
-            "авг" -> "авг."
-            "сен" -> "сент."
-            "окт" -> "окт."
-            "ноя" -> "нояб."
-            "дек" -> "дек."
-            else -> it
-        }
-    }
-}
 
 /**
  * Parse Rutracker.org
@@ -40,17 +22,17 @@ class RuTracker : TrackerParser {
 
         doc.getElementsByTag("tbody")?.last()?.getElementsByTag("tr")?.forEach {
             try {
-                val link = it.getElementsByTag("a").filter { l -> l.hasAttr("data-topic_id") }.first()
+                val link = it.getElementsByTag("a").first { l -> l.hasAttr("data-topic_id") }
                 val date = dateParser.parse(it.getElementsByTag("td").last().getElementsByTag("p").first().text().prepareMonth())
                 val seeds = it.getElementsByClass("seedmed")?.first()?.text() ?: ""
-                val leechers = it.getElementsByClass("leechmed")?.first()?.text() ?: ""
+                val leeches = it.getElementsByClass("leechmed")?.first()?.text() ?: ""
                 results.add(
                     TorrentInfo(
                         link.text(),
-                        it.getElementsByTag("a").filter { l -> l.hasClass("dl-stub") }.first().text().dropLast(2),
+                        it.getElementsByTag("a").first { l -> l.hasClass("dl-stub") }.text().dropLast(2),
                         link.attr("href"),
                         if (seeds.matches(Regex("^\\d+$"))) seeds.toInt() else 0,
-                        if (leechers.matches(Regex("^\\d+$"))) leechers.toInt() else 0,
+                        if (leeches.matches(Regex("^\\d+$"))) leeches.toInt() else 0,
                         null,
                         date,
                     )
@@ -85,4 +67,25 @@ class RuTracker : TrackerParser {
     }
 
     private fun parseInput(input: InputStream) = Jsoup.parse(input.bufferedReader(Charset.forName("Windows-1251")).use { it.readText() })
+
+    // Rewrite Rutracker date "20-Сен-12" into "20 сент. 12"
+    private fun String.prepareMonth(): String {
+        return this.lowercase().split("-").joinToString(" ") {
+            when (it) {
+                "янв" -> "янв."
+                "фев" -> "фев."
+                "мар" -> "мар."
+                "апр" -> "апр."
+                "мая" -> "мая"
+                "июн" -> "июн."
+                "июл" -> "июл."
+                "авг" -> "авг."
+                "сен" -> "сент."
+                "окт" -> "окт."
+                "ноя" -> "нояб."
+                "дек" -> "дек."
+                else -> it
+            }
+        }
+    }
 }

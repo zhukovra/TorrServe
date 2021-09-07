@@ -1,32 +1,14 @@
-package ru.yourok.torrserve.search
+package ru.yourok.torrserve.search.parsers
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import ru.yourok.torrserve.search.TorrentInfo
+import ru.yourok.torrserve.search.TorrentInfoFull
+import ru.yourok.torrserve.search.TrackerParser
 import java.io.InputStream
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
-
-// Rewrite Rutor date "20 Сен 12" into "20 сент. 12"
-private fun String.prepareMonth(): String {
-    return this.lowercase().split(" ").joinToString(" ") {
-        when (it) {
-            "янв" -> "янв."
-            "фев" -> "февр."
-            "мар" -> "мар."
-            "апр" -> "апр."
-            "май" -> "мая"
-            "июн" -> "июн."
-            "июл" -> "июл."
-            "авг" -> "авг."
-            "сен" -> "сент."
-            "окт" -> "окт."
-            "ноя" -> "нояб."
-            "дек" -> "дек."
-            else -> it
-        }
-    }
-}
 
 /**
  * Parse RuTor.org
@@ -88,4 +70,25 @@ class Rutor : TrackerParser {
     }
 
     private fun parseInput(input: InputStream) = Jsoup.parse(input.bufferedReader().use { it.readText() })
+
+    // Rewrite Rutor date "20 Сен 12" into "20 сент. 12"
+    private fun String.prepareMonth(): String {
+        return this.lowercase().split(" ").joinToString(" ") {
+            when (it) {
+                "янв" -> "янв."
+                "фев" -> "февр."
+                "мар" -> "мар."
+                "апр" -> "апр."
+                "май" -> "мая"
+                "июн" -> "июн."
+                "июл" -> "июл."
+                "авг" -> "авг."
+                "сен" -> "сент."
+                "окт" -> "окт."
+                "ноя" -> "нояб."
+                "дек" -> "дек."
+                else -> it
+            }
+        }
+    }
 }

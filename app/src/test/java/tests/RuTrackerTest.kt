@@ -1,7 +1,7 @@
 package tests
 
 import org.jsoup.Jsoup
-import ru.yourok.torrserve.search.RuTracker
+import ru.yourok.torrserve.search.parsers.RuTracker
 import ru.yourok.torrserve.search.TorrentInfo
 import ru.yourok.torrserve.search.TorrentInfoFull
 import java.nio.charset.Charset
