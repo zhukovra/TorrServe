@@ -38,14 +38,13 @@ class SearchFragment : TSFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val vi = inflater.inflate(R.layout.fragment_search, container, false)
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = adapter
-        return vi
+        return inflater.inflate(R.layout.fragment_search, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = adapter
 
         initSearchSettings()
 
@@ -63,7 +62,7 @@ class SearchFragment : TSFragment() {
                 } else false
             }
             // show search settings on key up (TV)
-            findViewById<EditText>(R.id.search_input).setOnKeyListener { view, i, keyEvent ->
+            findViewById<EditText>(R.id.search_input).setOnKeyListener { view, _, keyEvent ->
                 val cursorPos = (view as EditText).selectionStart
 
                 if (cursorPos == 0 && keyEvent.action == KeyEvent.ACTION_DOWN && keyEvent.keyCode == KeyEvent.KEYCODE_DPAD_UP) {
@@ -77,7 +76,7 @@ class SearchFragment : TSFragment() {
 
     // Setup saved preferences
     private fun initSearchSettings() {
-        val chosenSort = preferences.getInt(chosenSortPrefName, -1) ?: -1
+        val chosenSort = preferences.getInt(chosenSortPrefName, -1)
         if (chosenSort != -1) {
             view?.findViewById<RadioGroup>(R.id.searchSettingsSort)?.check(chosenSort)
         }
