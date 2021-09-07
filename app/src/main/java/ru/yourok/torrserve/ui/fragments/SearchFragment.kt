@@ -42,8 +42,8 @@ class SearchFragment : TSFragment() {
             findViewById<EditText>(R.id.search_input).setOnEditorActionListener { textView, i, _ ->
                 if (i == EditorInfo.IME_ACTION_SEARCH) {
                     search(textView.text.toString())
-                }
-                false
+                    true
+                } else false
             }
         }
     }
