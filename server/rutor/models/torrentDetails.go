@@ -74,3 +74,7 @@ type TorrentFile struct {
 func (d TorrentDetails) GetNames() string {
 	return strings.Join(d.Names, " ")
 }
+
+func (d TorrentDetails) Type() string {
+	return "torrent"
+}
