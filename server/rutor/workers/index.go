@@ -6,6 +6,7 @@ import (
 	"github.com/blevesearch/bleve/v2/analysis/lang/ru"
 	"golang.org/x/net/context"
 	"os"
+	"server/log"
 	"server/rutor/models"
 )
 
@@ -16,6 +17,7 @@ func IndexWorker(ctx context.Context, index bleve.Index, batchSize int, ch <-cha
 	for {
 		select {
 		case <-ctx.Done():
+			log.TLogln("Cancelled index worker")
 			return ctx.Err()
 		case torr, ok := <-ch:
 			if !ok {
@@ -25,6 +27,7 @@ func IndexWorker(ctx context.Context, index bleve.Index, batchSize int, ch <-cha
 						return err
 					}
 				}
+				log.TLogln("End index rutor database")
 				return nil
 			}
 			err = batch.Index(torr.Hash, torr)

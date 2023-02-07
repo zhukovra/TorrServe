@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/goccy/go-json"
 	bolt "go.etcd.io/bbolt"
+	"server/log"
 	"server/rutor/models"
 )
 
@@ -17,6 +18,7 @@ func WriteToDatabase(ctx context.Context, db *bolt.DB, batchSize int, ch <-chan 
 	for {
 		select {
 		case <-ctx.Done():
+			log.TLogln("Cancelled db worker")
 			return ctx.Err()
 		case model, ok := <-ch:
 			if !ok {
@@ -27,6 +29,7 @@ func WriteToDatabase(ctx context.Context, db *bolt.DB, batchSize int, ch <-chan 
 						return err
 					}
 				}
+				log.TLogln("End write rutor database")
 				return nil
 			}
 			batch = append(batch, model)

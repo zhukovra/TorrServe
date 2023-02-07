@@ -10,10 +10,10 @@ import (
 )
 
 // Download performs streaming on-the-fly download and unpack models.TorrentDetails to channel
-// without unnecessary writing files to disk
+// without unnecessary writing files to disk. It closes channel.
 func Download(ctx context.Context, url string, ch chan<- models.TorrentDetails) error {
 	log.TLogln("Start download rutor database")
-
+	defer close(ch)
 	resp, err := http.Get(url)
 	if err != nil {
 		log.TLogln("Error connect to rutor db:", err)
@@ -35,7 +35,7 @@ out:
 	for {
 		select {
 		case <-ctx.Done():
-			// if context cancelled - return error
+			log.TLogln("Cancelled download worker")
 			return ctx.Err()
 		default:
 			if dec.More() {

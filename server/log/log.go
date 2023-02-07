@@ -24,6 +24,8 @@ func Init(path, webpath string) {
 	webLogPath = webpath
 	logPath = path
 
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+
 	if webpath != "" {
 		ff, err := os.OpenFile(webLogPath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
