@@ -3,7 +3,7 @@ package workers
 import (
 	"compress/flate"
 	"context"
-	"encoding/json"
+	"github.com/goccy/go-json"
 	"net/http"
 	"server/log"
 	"server/rutor/models"
